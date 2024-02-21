@@ -1,4 +1,5 @@
 ﻿// issue 1
+
 static string Reverse(string s)
 {
     string res = "";
@@ -13,18 +14,22 @@ static string Reverse(string s)
 
 static string Issue1(string s)
 {
-    if(s != ValidateString(s))
+    string result = "";
+    if (s != ValidateString(s))
     {
         return ValidateString(s);
     }
 
     if (s.Length % 2 == 0)
     {
-        return Reverse(s.Substring(0, s.Length / 2)) +
+            result = Reverse(s.Substring(0, s.Length / 2)) +
             Reverse(s.Substring(s.Length / 2, s.Length / 2));
+        return result + $"\n{CountRepeatCharacter(result)}";
     }
 
-    return Reverse(s) + s;
+    result = Reverse(s) + s;
+
+    return result + $"\n{CountRepeatCharacter(result)}";
 }
 
 //issue 2
@@ -69,5 +74,17 @@ static string ValidateString(string s)
     return result;
 }
 
+// issue 3
+static string CountRepeatCharacter(string s)
+{
+    string result = "Characters:\n";
+    foreach (var letter in s.Distinct().ToArray())
+    {
+        var count = s.Count(chr => chr == letter);
+        result += $" {letter} = {count}\n";
+    }
+    return result;
+}
 
-Console.WriteLine(Issue1("some string"));
+
+Console.WriteLine(Issue1("mybeautifulmadness"));
