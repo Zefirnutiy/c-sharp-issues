@@ -15,6 +15,10 @@ static string Reverse(string s)
 static string Issue1(string s)
 {
     string result = "";
+    string quantityRepeatCharacters = "";
+    string operatedString = "";
+    string largestSubString = "";
+
     if (s != ValidateString(s))
     {
         return ValidateString(s);
@@ -22,14 +26,36 @@ static string Issue1(string s)
 
     if (s.Length % 2 == 0)
     {
-            result = Reverse(s.Substring(0, s.Length / 2)) +
-            Reverse(s.Substring(s.Length / 2, s.Length / 2));
-        return result + $"\n{CountRepeatCharacter(result)}";
+        int halfLengthOfString = s.Length / 2;
+
+        operatedString = Reverse(s.Substring(0, halfLengthOfString)) +
+        Reverse(s.Substring(halfLengthOfString, halfLengthOfString));
+
+        largestSubString = FindLargestSubString(operatedString);
+
+        quantityRepeatCharacters = CountRepeatCharacter(operatedString);
+
+        result = $"{operatedString}\n" +
+            $"Repeat Characters:\n" +
+            $"{quantityRepeatCharacters}\n" +
+            $"Largest valid Substring:\n" +
+            $"{largestSubString}";
+
+
+        return result;
     }
 
-    result = Reverse(s) + s;
+    operatedString = Reverse(s) + s;
+    quantityRepeatCharacters = CountRepeatCharacter(operatedString);
+    largestSubString = FindLargestSubString(operatedString);
 
-    return result + $"\n{CountRepeatCharacter(result)}";
+    result = $"{operatedString}\n" +
+            $"Repeat Characters:\n" +
+            $"{quantityRepeatCharacters}\n" +
+            $"Largest valid Substring:\n" +
+            $"{largestSubString}";
+
+    return result;
 }
 
 //issue 2
@@ -77,7 +103,7 @@ static string ValidateString(string s)
 // issue 3
 static string CountRepeatCharacter(string s)
 {
-    string result = "Characters:\n";
+    string result = "";
     foreach (var letter in s.Distinct().ToArray())
     {
         var count = s.Count(chr => chr == letter);
@@ -86,10 +112,70 @@ static string CountRepeatCharacter(string s)
     return result;
 }
 
+// issue 4
+static string FindLargestSubString(string s)
+{
 
-Console.WriteLine("Please input a string: ");
-string userInput = Console.ReadLine();
+    string result = "no correct substring";
+    int maxLength = -1;
+    for (var index = 0; index < s.Length; index++)
+    {
+        for(var i = s.Length; i >= 0 && i > index; i--)
+        {
+            string subSTR = s.Substring(index, i - index);
+            if (!validateSubString(subSTR))
+            {
+                continue;
+            }
 
-Console.WriteLine(Issue1(userInput));
+            if (subSTR.Length > maxLength)
+            {
+                maxLength = subSTR.Length;
+                result = subSTR;
+            }
+        }
+    }
+
+    return result;
+}
+
+static bool validateSubString(string s)
+{
+    string validateCharacters = "aeiouy";
+    bool startStringIsCorrect = false;
+    bool endStringIsCorrect = false;
+
+    foreach (var c in validateCharacters)
+    {
+        if (s[0] == c)
+        {
+            startStringIsCorrect = true;
+        }
+        if (s[s.Length - 1] == c)
+        {
+            endStringIsCorrect = true;
+        }
+    }
+
+
+    
+    return startStringIsCorrect && endStringIsCorrect;
+}
+
+
+
+
+
+
+Console.Write("Please input a string: ");
+string? userInput = Console.ReadLine();
+
+if (userInput != null)
+{
+    Console.WriteLine(Issue1(userInput));
+}else
+{
+    Console.WriteLine("you did not enter a string");
+}
 
 Console.ReadKey(); 
