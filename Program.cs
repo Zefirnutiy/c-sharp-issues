@@ -87,4 +87,9 @@ static string CountRepeatCharacter(string s)
 }
 
 
-Console.WriteLine(Issue1("mybeautifulmadness"));
+Console.WriteLine("Please input a string: ");
+string userInput = Console.ReadLine();
+
+Console.WriteLine(Issue1(userInput));
+
+Console.ReadKey(); 
