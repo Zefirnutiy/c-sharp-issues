@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 
 class Issue
 {
@@ -33,9 +34,7 @@ class Issue
 
     // issue 1
     static string Issue1(string s, string sortMethod )
-    {
-        Console.WriteLine(sortMethod);
-     
+    {     
         if (s != ValidateString(s))
         {
             return ValidateString(s);
@@ -81,27 +80,22 @@ class Issue
             }
         }
 
-        string result = $"{operatedString}\n" +
+        string strWithoutRandChar = RemoveOneRandomIndex(operatedString);
+
+
+        string result = $"Operated String:\n" +
+                $"{operatedString}\n\n" +
                 "Repeat Characters:\n" +
                 $"{quantityRepeatCharacters}\n" +
                 "Largest valid Substring:\n" +
                 $"{largestSubString}\n\n" +
                 "Sorted string:\n" +
-                $"{sortedString}";
+                $"{sortedString}\n\n" +
+                $"String without random char:\n" +
+                $"{strWithoutRandChar}";
 
         return result;
     }
-    static string Reverse(string s)
-{
-    string res = "";
-
-    for (int i = s.Length - 1; i >= 0; i--)
-    {
-        res += s[i];
-    }
-
-    return res;
-}
   
 
     //issue 2
@@ -343,6 +337,84 @@ class Issue
         return result;
     }
 
+
+    // utilities 
+    static string Reverse(string s)
+    {
+        string res = "";
+
+        for (int i = s.Length - 1; i >= 0; i--)
+        {
+            res += s[i];
+        }
+
+        return res;
+    }
+
+    // issue 6
+    static int GetRandomNum(int min, int max)
+    {
+        Random random = new Random();
+        int randomNumberInRange = random.Next(min, max);
+
+        return randomNumberInRange;
+
+    }
+
+    static string removeCharByIndex(string str, int index)
+    {
+        string result = "";
+        for(int i = 0; i < str.Length; i++)
+        {
+            if (i != index)
+            {
+                result += str[i];
+            }
+        }
+
+        return result;
+    }
+
+    static string RemoveOneRandomIndex(string s)
+    {
+
+        string result = "";
+        try
+        {
+            QueryRandom request = new QueryRandom();
+
+            request.min = 0;
+            request.max = s.Length;
+            request.count = 1;
+
+            string randomNum = WebRequest.GetRandomNumbers(request);
+
+            int charIndex;
+
+            // пришлось сделать такой костыль по скольку запрос к api возвращает [random num] - в скобках.
+            // конечно можно использовать trim, но так быстрее.
+            bool success = int.TryParse($"{randomNum[1]}", out charIndex);
+            if (!success)
+            {
+                Console.WriteLine("failed convert string to integer");
+                return "";
+            }
+
+            result = removeCharByIndex(s, charIndex);
+
+            return result;
+
+        }
+        catch
+        {
+            int randomNum = GetRandomNum(0, s.Length);
+
+            result = removeCharByIndex(s, randomNum);
+
+            return result;
+        }
+    }
+
 }
 
 class Node
@@ -418,5 +490,32 @@ class BinaryTree
             }
             InOrderRec(root.Right);
         }
+    }
+}
+
+
+
+// issue 6
+public struct QueryRandom
+{
+    public int min { get; set; }
+    public int max { get; set; }
+    public int count { get; set; }
+}
+class WebRequest
+{
+    private WebClient webClient = new WebClient();
+    
+
+    public static string GetRandomNumbers(QueryRandom param)
+    {
+        System.Net.WebRequest reqGET = System.Net.WebRequest.Create($"http://www.randomnumberapi.com/api/v1.0/random?min={param.min}&max={param.max}&count={param.count}");
+        System.Net.WebResponse resp = reqGET.GetResponse();
+        System.IO.Stream stream = resp.GetResponseStream();
+        System.IO.StreamReader sr = new System.IO.StreamReader(stream);
+        
+        string result = sr.ReadToEnd();
+
+        return result;
     }
 }
